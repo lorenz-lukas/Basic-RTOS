@@ -15,7 +15,8 @@ void WDT_ISR();
 
 typedef struct{
     void (*pTask)();          // Entrada atual da tarefa
-    uint16_t * pStack;         // Ponteiro da pilha
+    uint16_t * pStack;        // Ponteiro da pilha
+    uint16_t quantum, id, priority;
     volatile uint16_t wait_ticks;
 }task_t;
 
