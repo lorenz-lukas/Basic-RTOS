@@ -120,8 +120,9 @@ void startBRTOS(){
 
 void wait(uint16_t wait_ticks)
 {
-    tasks[taskNumber].wait_ticks = wait_ticks;
-    while(tasks[taskNumber].wait_ticks);
+    fifoPUT(currentTask, &fifos[3]);
+    currentTask.wait_ticks = wait_ticks;
+    while(currentTask.wait_ticks);
 }
 
 void fifoPUT(void pTask, fifo_t * fifo)
@@ -157,8 +158,12 @@ void WDT_ISR(){
         currentTask = fifoGET(fifos[1]); // Desaloca primeiro o de maior prioridade
     }else //if(fifos[0].size > 0) // Prioridade baixa
         currentTask = fifoGET(fifos[0]); // Desaloca primeiro o de maior prioridade
+    // Correr o fifos[3] e decrementar de todas as tarefas
+    if(fifos[3].size>0){
+      
+      //currentTask.wait_ticks--; // ATUALIZA OS TICKS DE TODAS AS TAREFAS PARA DAR O WAIT
 
-    currentTask.wait_ticks--; // ATUALIZA OS TICKS DE TODAS AS TAREFAS PARA DAR O WAIT
+    }
 
     asm("movx.a SP,  %0" : "=m" (schedSP));
     asm("movx.a %0,  SP" :: "m" (currentTask.pStack)); // INVOCA A TAREFA
